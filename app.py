@@ -171,7 +171,7 @@ def clear_form():
 
 # --- APP LAYOUT (HEADER) ---
 c1, c2, c3 = st.columns([1, 5, 1])
-with c1: st.image("/content/FBR-Logo-Small.png", width=100)
+with c1: st.image("FBR-Logo-Small.png", width=100)
 with c2: 
     # Show Company Name in Header
     company = st.session_state.user_details.get("company_name", "FBR Portal")
