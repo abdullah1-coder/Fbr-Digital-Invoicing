@@ -32,7 +32,7 @@ CLIENT_CONFIG = {
 CSV_FILE_NAME = "REFERENCES - REFERENCES.csv" 
 
 # --- PAGE SETUP ---
-st.set_page_config(page_title="FBR Digital Invoicing", page_icon="/content/FBR-Logo-Small.png", layout="wide")
+st.set_page_config(page_title="FBR Digital Invoicing", page_icon="FBR-Logo-Small.png", layout="wide")
 
 # --- YOUR CUSTOM CSS ---
 st.markdown("""
@@ -84,7 +84,7 @@ if not st.session_state.authenticated:
     # Centered Login Box
     c1, c2, c3 = st.columns([1, 2, 1])
     with c2:
-        st.image("/content/FBR-Logo-Small.png", width=150)
+        st.image("FBR-Logo-Small.png", width=150)
         st.markdown("## FBR Portal Login")
         st.markdown("Please sign in to access the Invoicing System.")
         
