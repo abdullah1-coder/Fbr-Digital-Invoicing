@@ -1,141 +1,167 @@
 import os
 import json
-import secrets
+import httpx
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import httpx
+from typing import List, Optional
 
 app = FastAPI()
 
 # --- 1. CONFIGURATION ---
-# Enable CORS so Streamlit can talk to this server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- 2. DATA MODELS ---
-# This ensures the data coming from Streamlit is correct
+# --- 2. DATA MODELS (Matches what Streamlit Sends) ---
 class InvoiceItem(BaseModel):
-    ItemCode: str
-    ItemName: str
-    Quantity: float
-    PCTCode: str
-    TaxRate: float
-    SaleValue: float
-    TotalAmount: float
-    TaxCharged: float
+    ItemCode: str          # Maps to hsCode
+    ItemName: str          # Maps to productDescription
+    Quantity: float        # Maps to quantity
+    TaxRate: float         # Maps to rate (need to convert to string "18%")
+    SaleValue: float       # Maps to valueSalesExcludingST
+    TaxCharged: float      # Maps to salesTaxApplicable
+    TotalAmount: float     # Maps to totalValues
 
 class InvoiceRequest(BaseModel):
     invoice_id: str
     usin: str
-    items: list[InvoiceItem]
+    items: List[InvoiceItem]
     total_bill: float
+    buyer_reg: Optional[str] = "1000000000000" # Default dummy
+    buyer_name: Optional[str] = "Walk-in Customer"
+    buyer_type: Optional[str] = "Unregistered"
 
 # --- 3. HELPER FUNCTION ---
-# Loads client secrets securely from Render Environment
 def get_client_config():
     config_str = os.getenv("CLIENT_CONFIG")
-    if not config_str:
-        # Fallback for local testing if needed, or return empty
-        print("WARNING: No CLIENT_CONFIG found in environment variables.")
-        return {}
+    if not config_str: return {}
     try:
         return json.loads(config_str)
     except json.JSONDecodeError:
         print("ERROR: CLIENT_CONFIG is not valid JSON.")
         return {}
 
-# --- 4. THE API ENDPOINT (UPDATED FOR SANDBOX) ---
-# --- 4. THE API ENDPOINT (FINAL CORRECTED VERSION) ---
+# --- 4. THE API ENDPOINT (REWRITTEN FOR DI FORMAT) ---
 @app.post("/submit-invoice")
 async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)):
     
     # A. Validate Client
     client_db = get_client_config()
-    
     if x_client_id not in client_db:
         raise HTTPException(status_code=401, detail="Unauthorized: Invalid Client ID")
     
     client_settings = client_db[x_client_id]
 
-    # B. Get Seller NTN (Handle missing key gracefully)
-    seller_ntn = client_settings.get("seller_ntn", "8885801") 
+    # B. Prepare DI Format Payload
+    # ---------------------------------------------------------
+    # We map the data from Streamlit to the FBR DI JSON format
+    # ---------------------------------------------------------
+    
+    # 1. Format the Date (YYYY-MM-DD)
+    invoice_date = datetime.now().strftime("%Y-%m-%d")
+    
+    # 2. Convert Items
+    fbr_items = []
+    for item in invoice.items:
+        # Convert Rate 18.0 -> "18%"
+        rate_str = f"{int(item.TaxRate)}%" if item.TaxRate.is_integer() else f"{item.TaxRate}%"
+        
+        fbr_item = {
+            "hsCode": item.ItemCode,
+            "productDescription": item.ItemName if item.ItemName else "Goods",
+            "rate": rate_str,
+            "uoM": "Numbers, pieces, units", # Default UoM
+            "quantity": item.Quantity,
+            "totalValues": item.TotalAmount,
+            "valueSalesExcludingST": item.SaleValue,
+            "fixedNotifiedValueOrRetailPrice": 0,
+            "salesTaxApplicable": item.TaxCharged,
+            "salesTaxWithheldAtSource": 0,
+            "extraTax": 0,
+            "furtherTax": 0,
+            "sroScheduleNo": "",
+            "fedPayable": 0,
+            "discount": 0,
+            "saleType": "Goods at standard rate (default)", # Default Scenario
+            "sroItemSerialNo": ""
+        }
+        fbr_items.append(fbr_item)
 
-    # C. Prepare FBR Payload
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+    # 3. Build Final Payload
     fbr_payload = {
-        "InvoiceNumber": invoice.invoice_id,
-        "POSID": int(client_settings.get("pos_id", 123456)), 
-        "USIN": invoice.usin,
-        "DateTime": current_time,
-        "BuyerNTN": "1234567-8", 
-        "BuyerName": "Walk-in Customer",
-        "TotalSaleValue": invoice.total_bill,
-        "TotalQuantity": sum(item.Quantity for item in invoice.items),
-        "TotalTaxCharged": sum(item.TaxCharged for item in invoice.items),
-        "Items": [item.dict() for item in invoice.items], 
-        "PaymentMode": 1,
-        "RefUSIN": "",
-        "SellerNTN": seller_ntn
+        "invoiceType": "Sale Invoice",
+        "invoiceDate": invoice_date,
+        "sellerNTNCNIC": client_settings.get("seller_ntn", "9999997"),
+        "sellerBusinessName": client_settings.get("name", "My Business"),
+        "sellerProvince": client_settings.get("province", "Sindh"), # Default if missing
+        "sellerAddress": client_settings.get("address", "Karachi"), # Default if missing
+        "buyerNTNCNIC": invoice.buyer_reg,
+        "buyerBusinessName": invoice.buyer_name,
+        "buyerProvince": "Sindh",
+        "buyerAddress": "Karachi",
+        "buyerRegistrationType": invoice.buyer_type,
+        "invoiceRefNo": invoice.invoice_id,
+        "scenarioId": "SN001", # Default to Standard Scenario
+        "items": fbr_items
     }
 
-    # D. SEND TO REAL FBR SANDBOX
+    # C. SEND TO FBR
     fbr_url = "https://gw.fbr.gov.pk/di_data/v1/di/postinvoicedata_sb"
-    
     headers = {
         "Authorization": f"Bearer {client_settings['auth_token']}",
         "Content-Type": "application/json"
     }
 
-    print(f"Sending to FBR with SellerNTN: {seller_ntn}") 
+    # Log what we are sending (Crucial for debugging)
+    print(f"🚀 SENDING DI PAYLOAD: {json.dumps(fbr_payload, indent=2)}") 
 
     async with httpx.AsyncClient() as client:
         try:
+            # verify=False is needed for FBR Sandbox SSL
             response = await client.post(fbr_url, json=fbr_payload, headers=headers, timeout=30.0)
             
-            # Print response for debugging
             print(f"FBR Status: {response.status_code}")
             print(f"FBR Response: {response.text}")
-            print(f"🚀 SENDING PAYLOAD: {json.dumps(fbr_payload, indent=2)}") 
-
-            print(f"Sending to FBR with SellerNTN: {seller_ntn}")
+            
             try:
                 fbr_response = response.json()
             except json.JSONDecodeError:
                 return {
-                    "status": "failed",
-                    "fbr_invoice_number": None,
-                    "message": f"FBR returned invalid JSON. Status: {response.status_code}"
+                    "status": "failed", 
+                    "message": f"Invalid JSON from FBR: {response.status_code}"
                 }
             
-            if response.status_code == 200 and "InvoiceNumber" in fbr_response:
-                 return {
-                    "status": "success",
-                    "fbr_invoice_number": fbr_response.get("InvoiceNumber"),
-                    "message": "Verified by FBR Sandbox"
-                }
+            # D. Handle Response
+            # FBR DI API returns "validationResponse" with "status": "Valid"
+            if "validationResponse" in fbr_response:
+                val_resp = fbr_response["validationResponse"]
+                
+                if val_resp.get("status") == "Valid":
+                    # Success! Grab the top-level invoiceNumber if available
+                    return {
+                        "status": "success",
+                        "fbr_invoice_number": fbr_response.get("invoiceNumber", "VERIFIED"),
+                        "message": "Verified by FBR"
+                    }
+                else:
+                    # Logic Error (e.g., Invalid HS Code)
+                    return {
+                        "status": "failed",
+                        "message": val_resp.get("error", "Validation Failed")
+                    }
             
-            else:
-                 # Check deeply nested error message first
-                 error_msg = "Unknown Error"
-                 if "validationResponse" in fbr_response:
-                     error_msg = fbr_response["validationResponse"].get("error", error_msg)
-                 else:
-                     error_msg = fbr_response.get("Message", fbr_response.get("Response", error_msg))
-                     
-                 return {
-                    "status": "failed",
-                    "fbr_invoice_number": None,
-                    "message": error_msg
-                }
+            # Fallback for 401 or other errors
+            return {
+                "status": "failed",
+                "message": fbr_response.get("Message", f"Error {response.status_code}")
+            }
 
         except Exception as e:
             print(f"Connection Error: {e}")
-            raise HTTPException(status_code=500, detail=f"Failed to connect to FBR: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"FBR Connection Failed: {str(e)}")
