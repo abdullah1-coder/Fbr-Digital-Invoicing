@@ -402,9 +402,11 @@ with st.form("invoice_form"):
     st.markdown('<div class="header-bar">🏢 2. Buyer & Seller</div><div class="css-card">', unsafe_allow_html=True)
     
     with st.expander("Seller Information (Click to Edit)", expanded=True):
-        sc1, sc2 = st.columns(2)
+        # 👇 CHANGED TO 3 COLUMNS TO FIT NTN
+        sc1, sc2, sc3 = st.columns(3)
         with sc1: seller_name_input = st.text_input("Seller Name", key="seller_name") 
-        with sc2: seller_prov = st.selectbox("Seller Province", get_options("Province"), index=5)
+        with sc2: seller_ntn = st.text_input("Seller NTN/CNIC", key="seller_ntn") # 👈 NEW FIELD ADDED
+        with sc3: seller_prov = st.selectbox("Seller Province", get_options("Province"), index=5)
 
     st.markdown("---")
     st.markdown("### Buyer Details")
@@ -412,11 +414,12 @@ with st.form("invoice_form"):
     with bc1: buyer_reg = st.text_input("Buyer NTN/CNIC *", key="buyer_reg")
     with bc2: buyer_name = st.text_input("Buyer Name *", key="buyer_name")
     with bc3: buyer_type = st.selectbox("Buyer Type *", get_options("Buyer Type"), key="buyer_type")
+    
     bc4, bc5 = st.columns([1, 2])
     with bc4: dest_supply = st.selectbox("Destination Supply *", get_options("Province"), key="dest_supply")
     with bc5: buyer_addr = st.text_input("Buyer Address *", key="buyer_addr")
+    
     st.markdown('</div>', unsafe_allow_html=True)
-
     # 3. PRODUCT
     st.markdown('<div class="header-bar">📦 3. Product Details</div><div class="css-card">', unsafe_allow_html=True)
     ic1, ic2, ic3, ic4 = st.columns(4)
