@@ -103,7 +103,9 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
             # Print response for debugging
             print(f"FBR Status: {response.status_code}")
             print(f"FBR Response: {response.text}")
-            
+            print(f"🚀 SENDING PAYLOAD: {json.dumps(fbr_payload, indent=2)}") 
+
+            print(f"Sending to FBR with SellerNTN: {seller_ntn}")
             try:
                 fbr_response = response.json()
             except json.JSONDecodeError:
