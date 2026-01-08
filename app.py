@@ -466,27 +466,33 @@ with st.form("invoice_form"):
     # ... inside your 'with st.form(...):' block ...
 
     # THIS IS THE ONLY BUTTON YOU NEED
-    # THIS IS THE ONLY BUTTON YOU NEED
     if st.form_submit_button("SUBMIT INVOICE TO FBR"):
         
-        # 1. Validation
-        missing = []
-        if not buyer_reg: missing.append("Buyer NTN")
-        if not buyer_name: missing.append("Buyer Name")
-        if not buyer_addr: missing.append("Buyer Address")
-        if qty <= 0: missing.append("Quantity")
-        if val_excl <= 0: missing.append("Value")
-        
-        if missing:
-            st.error(f"❌ Missing: {', '.join(missing)}")
-            st.stop()
-            
-        # 2. Prepare Data (Payload for Render)
-        # Note: We send the raw values, Python Backend will calculate tax/totals
+        # 1. Validation Logic (Keep existing...)
+        # ...
+
+        # 2. Extract Dynamic Scenario ID
+        # The dropdown value is like "SN001: Standard Rate..."
+        # We split by ":" and take the first part "SN001"
+        if "selected_scenario" in globals() and selected_scenario != "Select a Scenario...":
+            clean_scenario_id = selected_scenario.split(":")[0].strip()
+        else:
+            # Fallback if user didn't use the sidebar loader but filled form manually
+            # You might want to default to SN001 or SN002 based on buyer type
+            clean_scenario_id = "SN001" if buyer_type == "Registered" else "SN002"
+
+        # 3. Dynamic Payload
         payload = {
             "invoice_id": ref_no if ref_no else "INV-AUTO-001", 
             "usin": "USIN001",
             "total_bill": val_excl,
+            
+            # Send exactly what is in the text boxes
+            "buyer_reg": buyer_reg,   
+            "buyer_name": buyer_name,
+            "buyer_type": buyer_type,
+            "scenario_id": clean_scenario_id, # Sends "SN002", "SN001", etc.
+            
             "items": [
                 {
                     "ItemCode": str(hs_code),
