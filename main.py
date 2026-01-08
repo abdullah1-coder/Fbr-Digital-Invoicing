@@ -52,6 +52,7 @@ def get_client_config():
         return {}
 
 # --- 4. THE API ENDPOINT (UPDATED FOR SANDBOX) ---
+# --- 4. THE API ENDPOINT (UPDATED FOR SANDBOX FIX) ---
 @app.post("/submit-invoice")
 async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)):
     
@@ -63,26 +64,30 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
     
     client_settings = client_db[x_client_id]
 
-    # B. Prepare FBR Payload
-    # Note: FBR requires the current time in specific format
+    # B. Get Seller NTN (Handle missing key gracefully)
+    # Default to 9999997 (Sandbox Default) if not found in config
+    seller_ntn = client_settings.get("seller_ntn", "9999997") 
+
+    # C. Prepare FBR Payload
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     fbr_payload = {
         "InvoiceNumber": invoice.invoice_id,
-        "POSID": client_settings.get("pos_id", 123456), # Uses 123456 if not found
+        "POSID": int(client_settings.get("pos_id", 123456)), 
         "USIN": invoice.usin,
         "DateTime": current_time,
-        "BuyerNTN": "1234567-8", # Placeholder for sandbox
+        "BuyerNTN": "1234567-8", # Placeholder
         "BuyerName": "Walk-in Customer",
         "TotalSaleValue": invoice.total_bill,
         "TotalQuantity": sum(item.Quantity for item in invoice.items),
         "TotalTaxCharged": sum(item.TaxCharged for item in invoice.items),
         "Items": [item.dict() for item in invoice.items], 
         "PaymentMode": 1,
-        "RefUSIN": ""
+        "RefUSIN": "",
+        "SellerNTN": seller_ntn  # <--- NOW USING THE CORRECT 7-DIGIT VAR
     }
 
-    # C. SEND TO REAL FBR SANDBOX
+    # D. SEND TO REAL FBR SANDBOX
     fbr_url = "https://gw.fbr.gov.pk/di_data/v1/di/postinvoicedata_sb"
     
     headers = {
@@ -90,18 +95,16 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
         "Content-Type": "application/json"
     }
 
-    print(f"Sending invoice {invoice.invoice_id} to FBR Sandbox...") 
+    print(f"Sending to FBR with SellerNTN: {seller_ntn}") 
 
     async with httpx.AsyncClient() as client:
         try:
-            # verify=False is often needed for FBR Sandbox due to SSL issues
             response = await client.post(fbr_url, json=fbr_payload, headers=headers, timeout=30.0)
             
-            # Print response to Render logs for debugging
+            # Print response for debugging
             print(f"FBR Status: {response.status_code}")
             print(f"FBR Response: {response.text}")
             
-            # Handle JSON decoding safely
             try:
                 fbr_response = response.json()
             except json.JSONDecodeError:
@@ -111,7 +114,6 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
                     "message": f"FBR returned invalid JSON. Status: {response.status_code}"
                 }
             
-            # Check for Success (200 OK)
             if response.status_code == 200:
                  return {
                     "status": "success",
@@ -119,10 +121,11 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
                     "message": "Verified by FBR Sandbox"
                 }
             else:
+                 # Pass the exact error message from FBR back to Streamlit
                  return {
                     "status": "failed",
                     "fbr_invoice_number": None,
-                    "message": fbr_response.get("Message", f"Error {response.status_code}")
+                    "message": fbr_response.get("Response", fbr_response.get("Message", "Unknown Error"))
                 }
 
         except Exception as e:
