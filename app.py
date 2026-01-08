@@ -6,35 +6,7 @@ import json
 import re
 # In your app.py
 
-if st.button("Generate Invoice"):
-    
-    # 👇 THIS IS YOUR NEW LIVE BACKEND 👇
-    api_url = "https://fbr-digital-invoicing.onrender.com/submit-invoice"
-    
-    # Data to send
-    payload = {
-        "invoice_id": "INV-001", # You can make this dynamic later
-        "usin": "USIN001",
-        "total_bill": 5000.0,
-        "items": [] # Add your items logic here
-    }
-    
-    # Headers (This simulates "Client A")
-    headers = {"x-client-id": "client_A"}
 
-    with st.spinner("Talking to FBR..."):
-        try:
-            response = requests.post(api_url, json=payload, headers=headers)
-            data = response.json()
-            
-            if response.status_code == 200:
-                st.success("Success!")
-                st.write(f"FBR Invoice No: {data['fbr_invoice_number']}")
-            else:
-                st.error(f"Error: {data['detail']}")
-                
-        except Exception as e:
-            st.error(f"Connection Failed: {e}")
 # ==========================================
 # ⚙️ MULTI-CLIENT CONFIGURATION
 # ==========================================
@@ -292,9 +264,10 @@ with st.form("invoice_form"):
     # ... inside your 'with st.form(...):' block ...
 
     # THIS IS THE ONLY BUTTON YOU NEED
+    # THIS IS THE ONLY BUTTON YOU NEED
     if st.form_submit_button("SUBMIT INVOICE TO FBR"):
         
-        # 1. Validation (Your existing code)
+        # 1. Validation
         missing = []
         if not buyer_reg: missing.append("Buyer NTN")
         if not buyer_name: missing.append("Buyer Name")
@@ -306,25 +279,37 @@ with st.form("invoice_form"):
             st.error(f"❌ Missing: {', '.join(missing)}")
             st.stop()
             
-        # 2. Prepare Data (Payload)
+        # 2. Prepare Data (Payload for Render)
+        # Note: We send the raw values, Python Backend will calculate tax/totals
         payload = {
-            "invoice_id": "INV-AUTO-001",  # Replace with dynamic ID if you have one
+            "invoice_id": ref_no if ref_no else "INV-AUTO-001", 
             "usin": "USIN001",
             "total_bill": val_excl,
-            "items": []  # You can add items logic here later
+            "items": [
+                {
+                    "ItemCode": str(hs_code),
+                    "ItemName": prod_desc,
+                    "Quantity": qty,
+                    "PCTCode": str(hs_code),
+                    "TaxRate": rate_val,
+                    "SaleValue": val_excl,
+                    "TotalAmount": val_excl + tax_amt,
+                    "TaxCharged": tax_amt
+                }
+            ]
         }
         
-        # 3. Prepare Headers
+        # 3. Prepare Headers (Dynamic)
+        current_user = st.session_state.user_details.get('username_key', 'client_a')
         headers = {
-            "x-client-id": "client_A",  # Or use st.session_state if you made the selector
+            "x-client-id": current_user,
             "Content-Type": "application/json"
         }
 
-        # 4. SEND TO RENDER (The missing piece)
-        # Make sure api_url is defined at the top of your file
+        # 4. SEND TO RENDER
         api_url = "https://fbr-digital-invoicing.onrender.com/submit-invoice"
         
-        with st.spinner("Connecting to FBR..."):
+        with st.spinner("Talking to FBR..."):
             try:
                 response = requests.post(api_url, json=payload, headers=headers)
                 
@@ -332,45 +317,10 @@ with st.form("invoice_form"):
                     data = response.json()
                     st.success(f"Success! FBR Number: {data.get('fbr_invoice_number')}")
                     
-                    # Optional: Show receipt details
-                    with st.expander("View FBR Receipt"):
+                    with st.expander("View FBR Receipt Details"):
                         st.json(data)
                 else:
                     st.error(f"FBR Error: {response.text}")
                     
             except Exception as e:
                 st.error(f"Connection Failed: {e}")
-
-        # --- DYNAMIC WEBHOOK SELECTION ---
-        # Get the webhook assigned to this user from the session config
-        user_webhook = st.session_state.user_details.get("webhook", "")
-        
-        if not user_webhook:
-            st.error("❌ Configuration Error: No Webhook found for this user.")
-            st.stop()
-
-        payload = {
-            "Doc Type (G)": doc_type, "Date (H)": str(inv_date),
-            "Registration No (B)": str(buyer_reg), "Buyer Name (C)": buyer_name,
-            "Type (D)": buyer_type, "Destination Of Supply (E)": dest_supply,
-            "Buyer Address (F)": buyer_addr, "HS CODE (I)": hs_code,
-            "Sale Type (J)": sale_type, "Rate (K)": rate_val, "Rate String": rate_str,
-            "Quantity (L)": qty, "UoM (M)": uom,
-            "Value of Sales Excluding Sales Tax (N)": val_excl,
-            "Sales Tax/ FED in ST Mode (O)": st_fed,
-            "Fixed / notified value (P)": fixed_val, "Extra Tax (Q)": extra_tax,
-            "Further Tax (R)": further_tax, "ST Withheld (T)": wht,
-            "SRO No. (U)": sro, "Item S. No. (V)": item_no,
-            "Invoice Reference No. (W)": ref_no, "Product Description (X)": prod_desc,
-            "Sales Tax Applicable (Y)": st_app, "Discount (Z)": discount, "Reason": reason,
-            "Seller Name (AA)": seller_name_input, 
-            "Sale Origination Province (AB)": seller_prov, "Status (AD)": "Pending",
-            "Submitted By": st.session_state.user_details.get("company_name", "Unknown")
-        }
-        
-        with st.spinner("Transmitting..."):
-            try:
-                # Use the user-specific webhook
-                # response = requests.post(user_webhook, json=payload)
-                st.success("✅ Submitted Successfully!")
-            except Exception as e: st.error(f"Error: {e}")
