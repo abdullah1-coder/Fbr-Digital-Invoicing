@@ -287,9 +287,14 @@ with st.form("invoice_form"):
     with at8: sro = st.selectbox("SRO / Schedule No", get_options("SRO"), key="sro")
     with at9: item_no = st.selectbox("Item Sr. No.", get_options("Item Sr. No."), key="item_no")
     st.markdown('</div>', unsafe_allow_html=True)
-'''
+
     # SUBMIT
-    if st.form_submit_button(" SUBMIT INVOICE TO FBR"):
+    # ... inside your 'with st.form(...):' block ...
+
+    # THIS IS THE ONLY BUTTON YOU NEED
+    if st.form_submit_button("SUBMIT INVOICE TO FBR"):
+        
+        # 1. Validation (Your existing code)
         missing = []
         if not buyer_reg: missing.append("Buyer NTN")
         if not buyer_name: missing.append("Buyer Name")
@@ -300,35 +305,35 @@ with st.form("invoice_form"):
         if missing:
             st.error(f"❌ Missing: {', '.join(missing)}")
             st.stop()
-            '''
-        # A. Define the data to send (Use your actual variables)
+            
+        # 2. Prepare Data (Payload)
         payload = {
-            "invoice_id": "INV-AUTO-001",  # You can generate this dynamically
+            "invoice_id": "INV-AUTO-001",  # Replace with dynamic ID if you have one
             "usin": "USIN001",
-            "total_bill": val_excl,        # Using your variable 'val_excl'
-            "items": []                    # Add items logic if needed
+            "total_bill": val_excl,
+            "items": []  # You can add items logic here later
         }
         
-        # B. Define headers (for authentication/client selection)
+        # 3. Prepare Headers
         headers = {
-            "x-client-id": "client_A",     # Or use your dynamic variable
+            "x-client-id": "client_A",  # Or use st.session_state if you made the selector
             "Content-Type": "application/json"
         }
 
-        # C. Send to your Render Backend
+        # 4. SEND TO RENDER (The missing piece)
+        # Make sure api_url is defined at the top of your file
+        api_url = "https://fbr-digital-invoicing.onrender.com/submit-invoice"
+        
         with st.spinner("Connecting to FBR..."):
             try:
-                # Make sure 'api_url' is defined at the top of your file!
                 response = requests.post(api_url, json=payload, headers=headers)
                 
                 if response.status_code == 200:
                     data = response.json()
-                    
-                    # ✅ THIS IS THE NEW SUCCESS LINE
                     st.success(f"Success! FBR Number: {data.get('fbr_invoice_number')}")
                     
-                    # Optional: Show full receipt
-                    with st.expander("View FBR Receipt Details"):
+                    # Optional: Show receipt details
+                    with st.expander("View FBR Receipt"):
                         st.json(data)
                 else:
                     st.error(f"FBR Error: {response.text}")
