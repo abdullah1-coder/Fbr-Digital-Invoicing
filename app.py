@@ -300,6 +300,40 @@ with st.form("invoice_form"):
         if missing:
             st.error(f"❌ Missing: {', '.join(missing)}")
             st.stop()
+        # A. Define the data to send (Use your actual variables)
+        payload = {
+            "invoice_id": "INV-AUTO-001",  # You can generate this dynamically
+            "usin": "USIN001",
+            "total_bill": val_excl,        # Using your variable 'val_excl'
+            "items": []                    # Add items logic if needed
+        }
+        
+        # B. Define headers (for authentication/client selection)
+        headers = {
+            "x-client-id": "client_A",     # Or use your dynamic variable
+            "Content-Type": "application/json"
+        }
+
+        # C. Send to your Render Backend
+        with st.spinner("Connecting to FBR..."):
+            try:
+                # Make sure 'api_url' is defined at the top of your file!
+                response = requests.post(api_url, json=payload, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # ✅ THIS IS THE NEW SUCCESS LINE
+                    st.success(f"Success! FBR Number: {data.get('fbr_invoice_number')}")
+                    
+                    # Optional: Show full receipt
+                    with st.expander("View FBR Receipt Details"):
+                        st.json(data)
+                else:
+                    st.error(f"FBR Error: {response.text}")
+                    
+            except Exception as e:
+                st.error(f"Connection Failed: {e}")
 
         # --- DYNAMIC WEBHOOK SELECTION ---
         # Get the webhook assigned to this user from the session config
