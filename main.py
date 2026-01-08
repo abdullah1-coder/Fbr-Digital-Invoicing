@@ -51,7 +51,7 @@ def get_client_config():
         print("ERROR: CLIENT_CONFIG is not valid JSON.")
         return {}
 
-# --- 4. THE API ENDPOINT ---
+# --- 4. THE API ENDPOINT (UPDATED FOR SANDBOX) ---
 @app.post("/submit-invoice")
 async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)):
     
@@ -63,61 +63,68 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
     
     client_settings = client_db[x_client_id]
 
-    # B. Prepare FBR Payload (The exact JSON FBR expects)
-    # We calculate the current time dynamically
+    # B. Prepare FBR Payload
+    # Note: FBR requires the current time in specific format
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     fbr_payload = {
         "InvoiceNumber": invoice.invoice_id,
-        "POSID": client_settings["pos_id"],
+        "POSID": client_settings.get("pos_id", 123456), # Uses 123456 if not found
         "USIN": invoice.usin,
         "DateTime": current_time,
-        "BuyerNTN": "1234567-8", # Optional: Add to model if you need real buyer NTNs
+        "BuyerNTN": "1234567-8", # Placeholder for sandbox
         "BuyerName": "Walk-in Customer",
         "TotalSaleValue": invoice.total_bill,
         "TotalQuantity": sum(item.Quantity for item in invoice.items),
         "TotalTaxCharged": sum(item.TaxCharged for item in invoice.items),
-        "Items": [item.dict() for item in invoice.items], # Converts Pydantic items to dict
+        "Items": [item.dict() for item in invoice.items], 
         "PaymentMode": 1,
         "RefUSIN": ""
     }
 
-    # C. Send to FBR (Real Logic vs Simulation)
+    # C. SEND TO REAL FBR SANDBOX
+    fbr_url = "https://gw.fbr.gov.pk/di_data/v1/di/postinvoicedata_sb"
     
-    # --- REAL FBR CALL (Uncomment this when you have real credentials) ---
-    # headers = {
-    #     "Authorization": f"Bearer {client_settings['auth_token']}",
-    #     "Content-Type": "application/json"
-    # }
-    # async with httpx.AsyncClient() as client:
-    #     response = await client.post(
-    #         "https://esp.fbr.gov.pk:8243/FBR/v1/api/Live/PostData", 
-    #         json=fbr_payload, 
-    #         headers=headers
-    #     )
-    #     fbr_response = response.json()
-    
-    # --- SIMULATED FBR RESPONSE (So you can test immediately) ---
-    # We simulate what FBR *would* return if it was successful
-    fake_fbr_invoice_number = f"FBR-{secrets.token_hex(4).upper()}"
-    fbr_response = {
-        "Response": "Success", 
-        "Code": 100, 
-        "InvoiceNumber": fake_fbr_invoice_number,
-        "Message": "Invoice posted successfully"
+    headers = {
+        "Authorization": f"Bearer {client_settings['auth_token']}",
+        "Content-Type": "application/json"
     }
-    
-    # D. Return Data to Frontend
-    # This is exactly what Streamlit will see
-    if fbr_response.get("Response") == "Success":
-        return {
-            "status": "success",
-            "fbr_invoice_number": fbr_response.get("InvoiceNumber"),
-            "message": "Verified by FBR"
-        }
-    else:
-        return {
-            "status": "failed",
-            "fbr_invoice_number": None,
-            "message": fbr_response.get("Message", "Unknown Error")
-        }
+
+    print(f"Sending invoice {invoice.invoice_id} to FBR Sandbox...") 
+
+    async with httpx.AsyncClient() as client:
+        try:
+            # verify=False is often needed for FBR Sandbox due to SSL issues
+            response = await client.post(fbr_url, json=fbr_payload, headers=headers, timeout=30.0)
+            
+            # Print response to Render logs for debugging
+            print(f"FBR Status: {response.status_code}")
+            print(f"FBR Response: {response.text}")
+            
+            # Handle JSON decoding safely
+            try:
+                fbr_response = response.json()
+            except json.JSONDecodeError:
+                return {
+                    "status": "failed",
+                    "fbr_invoice_number": None,
+                    "message": f"FBR returned invalid JSON. Status: {response.status_code}"
+                }
+            
+            # Check for Success (200 OK)
+            if response.status_code == 200:
+                 return {
+                    "status": "success",
+                    "fbr_invoice_number": fbr_response.get("InvoiceNumber", "No-Number-Returned"),
+                    "message": "Verified by FBR Sandbox"
+                }
+            else:
+                 return {
+                    "status": "failed",
+                    "fbr_invoice_number": None,
+                    "message": fbr_response.get("Message", f"Error {response.status_code}")
+                }
+
+        except Exception as e:
+            print(f"Connection Error: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to connect to FBR: {str(e)}")
