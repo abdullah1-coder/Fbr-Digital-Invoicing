@@ -66,9 +66,7 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
 
     # B. Get Seller NTN (Handle missing key gracefully)
     # Default to 9999997 (Sandbox Default) if not found in config
-    seller_ntn = client_settings.get("seller_ntn", "9999997") 
-
-    # C. Prepare FBR Payload
+    seller_ntn = client_settings.get("seller_ntn")  # C. Prepare FBR Payload
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     fbr_payload = {
@@ -101,10 +99,9 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
         try:
             response = await client.post(fbr_url, json=fbr_payload, headers=headers, timeout=30.0)
             
-            # Print response for debugging
-            print(f"FBR Status: {response.status_code}")
-            print(f"FBR Response: {response.text}")
-            
+            # ... inside submit_invoice function ...
+
+            # 1. PARSE THE FBR RESPONSE
             try:
                 fbr_response = response.json()
             except json.JSONDecodeError:
@@ -114,20 +111,28 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
                     "message": f"FBR returned invalid JSON. Status: {response.status_code}"
                 }
             
-            if response.status_code == 200:
+            # 2. CHECK FOR SUCCESS
+            if response.status_code == 200 and "InvoiceNumber" in fbr_response:
                  return {
                     "status": "success",
-                    "fbr_invoice_number": fbr_response.get("InvoiceNumber", "No-Number-Returned"),
+                    "fbr_invoice_number": fbr_response.get("InvoiceNumber"),
                     "message": "Verified by FBR Sandbox"
                 }
+            
+            # 3. HANDLE FBR ERRORS (The Fix)
             else:
-                 # Pass the exact error message from FBR back to Streamlit
+                 # Check deeply nested error message first
+                 error_msg = "Unknown Error"
+                 
+                 if "validationResponse" in fbr_response:
+                     # Grab 'error' from inside validationResponse
+                     error_msg = fbr_response["validationResponse"].get("error", error_msg)
+                 else:
+                     # Grab top-level Message or Response
+                     error_msg = fbr_response.get("Message", fbr_response.get("Response", error_msg))
+                     
                  return {
                     "status": "failed",
                     "fbr_invoice_number": None,
-                    "message": fbr_response.get("Response", fbr_response.get("Message", "Unknown Error"))
+                    "message": error_msg
                 }
-
-        except Exception as e:
-            print(f"Connection Error: {e}")
-            raise HTTPException(status_code=500, detail=f"Failed to connect to FBR: {str(e)}")
