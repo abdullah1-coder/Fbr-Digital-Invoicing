@@ -287,7 +287,7 @@ with st.form("invoice_form"):
     with at8: sro = st.selectbox("SRO / Schedule No", get_options("SRO"), key="sro")
     with at9: item_no = st.selectbox("Item Sr. No.", get_options("Item Sr. No."), key="item_no")
     st.markdown('</div>', unsafe_allow_html=True)
-
+'''
     # SUBMIT
     if st.form_submit_button(" SUBMIT INVOICE TO FBR"):
         missing = []
@@ -300,6 +300,7 @@ with st.form("invoice_form"):
         if missing:
             st.error(f"❌ Missing: {', '.join(missing)}")
             st.stop()
+            '''
         # A. Define the data to send (Use your actual variables)
         payload = {
             "invoice_id": "INV-AUTO-001",  # You can generate this dynamically
