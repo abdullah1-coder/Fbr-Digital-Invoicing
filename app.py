@@ -323,7 +323,7 @@ def clear_form():
 # 🧪 SIDEBAR: TEST DATA LOADER
 # ==========================================
 st.sidebar.markdown("---")
-st.sidebar.header("🧪 Test Data Loader")
+st.sidebar.header("Test Data Loader")
 selected_scenario = st.sidebar.selectbox("Load FBR Scenario", list(TEST_SCENARIOS.keys()))
 
 if selected_scenario != "Select a Scenario...":
