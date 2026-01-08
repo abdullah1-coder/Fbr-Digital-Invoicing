@@ -52,7 +52,7 @@ def get_client_config():
         return {}
 
 # --- 4. THE API ENDPOINT (UPDATED FOR SANDBOX) ---
-# --- 4. THE API ENDPOINT (UPDATED FOR SANDBOX FIX) ---
+# --- 4. THE API ENDPOINT (FINAL CORRECTED VERSION) ---
 @app.post("/submit-invoice")
 async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)):
     
@@ -65,8 +65,9 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
     client_settings = client_db[x_client_id]
 
     # B. Get Seller NTN (Handle missing key gracefully)
-    # Default to 9999997 (Sandbox Default) if not found in config
-    seller_ntn = client_settings.get("seller_ntn")  # C. Prepare FBR Payload
+    seller_ntn = client_settings.get("seller_ntn", "8885801") 
+
+    # C. Prepare FBR Payload
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     fbr_payload = {
@@ -74,7 +75,7 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
         "POSID": int(client_settings.get("pos_id", 123456)), 
         "USIN": invoice.usin,
         "DateTime": current_time,
-        "BuyerNTN": "1234567-8", # Placeholder
+        "BuyerNTN": "1234567-8", 
         "BuyerName": "Walk-in Customer",
         "TotalSaleValue": invoice.total_bill,
         "TotalQuantity": sum(item.Quantity for item in invoice.items),
@@ -82,7 +83,7 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
         "Items": [item.dict() for item in invoice.items], 
         "PaymentMode": 1,
         "RefUSIN": "",
-        "SellerNTN": seller_ntn  # <--- NOW USING THE CORRECT 7-DIGIT VAR
+        "SellerNTN": seller_ntn
     }
 
     # D. SEND TO REAL FBR SANDBOX
@@ -99,9 +100,10 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
         try:
             response = await client.post(fbr_url, json=fbr_payload, headers=headers, timeout=30.0)
             
-            # ... inside submit_invoice function ...
-
-            # 1. PARSE THE FBR RESPONSE
+            # Print response for debugging
+            print(f"FBR Status: {response.status_code}")
+            print(f"FBR Response: {response.text}")
+            
             try:
                 fbr_response = response.json()
             except json.JSONDecodeError:
@@ -111,7 +113,6 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
                     "message": f"FBR returned invalid JSON. Status: {response.status_code}"
                 }
             
-            # 2. CHECK FOR SUCCESS
             if response.status_code == 200 and "InvoiceNumber" in fbr_response:
                  return {
                     "status": "success",
@@ -119,16 +120,12 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
                     "message": "Verified by FBR Sandbox"
                 }
             
-            # 3. HANDLE FBR ERRORS (The Fix)
             else:
                  # Check deeply nested error message first
                  error_msg = "Unknown Error"
-                 
                  if "validationResponse" in fbr_response:
-                     # Grab 'error' from inside validationResponse
                      error_msg = fbr_response["validationResponse"].get("error", error_msg)
                  else:
-                     # Grab top-level Message or Response
                      error_msg = fbr_response.get("Message", fbr_response.get("Response", error_msg))
                      
                  return {
@@ -136,3 +133,7 @@ async def submit_invoice(invoice: InvoiceRequest, x_client_id: str = Header(...)
                     "fbr_invoice_number": None,
                     "message": error_msg
                 }
+
+        except Exception as e:
+            print(f"Connection Error: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to connect to FBR: {str(e)}")
