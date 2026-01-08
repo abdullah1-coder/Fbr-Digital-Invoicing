@@ -30,7 +30,153 @@ CLIENT_CONFIG = {
     }
 }
 # ==========================================
+# ==========================================
+# 🧪 FBR TESTING SCENARIOS (SOURCE: DI SANDBOX PDF)
+# ==========================================
+TEST_SCENARIOS = {
+    "Select a Scenario...": {},
 
+    "SN001: Standard Rate (Reg Buyer)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "2046004", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
+        "buyer_type": "Registered", "sale_type": "Goods at standard rate (default)", "rate_idx": "18%",
+        "hs_code_idx": "0101.2100", "qty": 400.0, "val_excl": 1000.0, "uom": "Numbers, pieces, units"
+    },
+    "SN002: Standard Rate (Unreg Buyer)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1234567", "buyer_name": "Unregistered Buyer",
+        "buyer_type": "Unregistered", "sale_type": "Goods at standard rate (default)", "rate_idx": "18%",
+        "hs_code_idx": "0101.2100", "qty": 400.0, "val_excl": 1000.0, "uom": "Numbers, pieces, units"
+    },
+    "SN003: Steel / Re-Rolling": {
+        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "Steel Buyer Ltd",
+        "buyer_type": "Unregistered", "sale_type": "Steel melting and re-rolling", "rate_idx": "18%",
+        "hs_code_idx": "7214.1010", "qty": 1.0, "val_excl": 205000.0, "uom": "MT"
+    },
+    "SN004: Ship Breaking (Scrap)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "Ship Scrapper Co",
+        "buyer_type": "Unregistered", "sale_type": "Ship breaking", "rate_idx": "18%",
+        "hs_code_idx": "7204.1010", "qty": 1.0, "val_excl": 175000.0, "uom": "MT"
+    },
+    "SN005: Reduced Rate (8th Sch)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Reduced Rate Buyer",
+        "buyer_type": "Unregistered", "sale_type": "Goods at Reduced Rate", "rate_idx": "1%",
+        "hs_code_idx": "0102.2930", "qty": 1.0, "val_excl": 1000.0, "sro": "EIGHTH SCHEDULE Table 1", "item_no": "82"
+    },
+    "SN006: Exempt Goods (6th Sch)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "2046004", "buyer_name": "Exempt Buyer Reg",
+        "buyer_type": "Registered", "sale_type": "Exempt goods", "rate_idx": "Exempt", # Check your CSV for exact spelling
+        "hs_code_idx": "0102.2930", "qty": 1.0, "val_excl": 10.0, "sro": "6th Schd Table I", "item_no": "100"
+    },
+    "SN007: Zero-Rated (5th Sch)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "Exporter Co",
+        "buyer_type": "Unregistered", "sale_type": "Goods at zero-rate", "rate_idx": "0%",
+        "hs_code_idx": "0101.2100", "qty": 100.0, "val_excl": 100.0, "sro": "327(1)/2008"
+    },
+    "SN008: 3rd Schedule Goods": {
+        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "Retail Item Buyer",
+        "buyer_type": "Unregistered", "sale_type": "3rd Schedule Goods", "rate_idx": "18%",
+        "hs_code_idx": "0101.2100", "qty": 100.0, "val_excl": 0.0, "fixed_val": 1000.0 # Retail Price
+    },
+    "SN009: Cotton Ginners": {
+        "doc_type": "Sale Invoice", "buyer_reg": "2046004", "buyer_name": "Cotton Buyer Reg",
+        "buyer_type": "Registered", "sale_type": "Cotton ginners", "rate_idx": "18%",
+        "hs_code_idx": "0101.2100", "qty": 0.0, "val_excl": 2500.0
+    },
+    "SN010: Telecom Services": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Telecom Consumer",
+        "buyer_type": "Unregistered", "sale_type": "Telecommunication services", "rate_idx": "17%", # Check if 17% exists in your CSV
+        "hs_code_idx": "0101.2100", "qty": 1000.0, "val_excl": 100.0
+    },
+    "SN011: Toll Manufacturing": {
+        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "Principal Co",
+        "buyer_type": "Unregistered", "sale_type": "Toll Manufacturing", "rate_idx": "18%",
+        "hs_code_idx": "7214.9990", "qty": 1.0, "val_excl": 205000.0, "uom": "MT"
+    },
+    "SN012: Petroleum Products": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Petrol Pump",
+        "buyer_type": "Unregistered", "sale_type": "Petroleum Products", "rate_idx": "1.43%", # Special Rate
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 100.0, "sro": "1450(I)/2021"
+    },
+    "SN013: Electricity to Retailers": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Retail Shop Elec",
+        "buyer_type": "Unregistered", "sale_type": "Electricity Supply to Retailers", "rate_idx": "5%",
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0
+    },
+    "SN014: Gas to CNG Stations": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "CNG Station",
+        "buyer_type": "Unregistered", "sale_type": "Gas to CNG stations", "rate_idx": "18%",
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0
+    },
+    "SN015: Mobile Phones (9th Sch)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Mobile Buyer",
+        "buyer_type": "Unregistered", "sale_type": "Mobile Phones", "rate_idx": "18%",
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1234.0, "sro": "NINTH SCHEDULE"
+    },
+    "SN016: Processing/Conversion": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000078", "buyer_name": "Processing Client",
+        "buyer_type": "Unregistered", "sale_type": "Processing/Conversion of Goods", "rate_idx": "5%",
+        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 100.0
+    },
+    "SN017: Goods (FED in ST Mode)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "7000009", "buyer_name": "FED Payer",
+        "buyer_type": "Unregistered", "sale_type": "Goods (FED in ST Mode)", "rate_idx": "8%",
+        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 100.0
+    },
+    "SN018: Services (FED in ST Mode)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000056", "buyer_name": "Service Receiver",
+        "buyer_type": "Unregistered", "sale_type": "Services (FED in ST Mode)", "rate_idx": "8%",
+        "hs_code_idx": "0101.2100", "qty": 20.0, "val_excl": 1000.0
+    },
+    "SN019: Services (ICT Ordinance)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "ICT Service Buyer",
+        "buyer_type": "Unregistered", "sale_type": "Services", "rate_idx": "5%",
+        "hs_code_idx": "0101.2900", "qty": 1.0, "val_excl": 100.0, "sro": "ICTO TABLE I"
+    },
+    "SN020: Electric Vehicles": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "EV Buyer",
+        "buyer_type": "Unregistered", "sale_type": "Electric Vehicle", "rate_idx": "1%",
+        "hs_code_idx": "0101.2900", "qty": 122.0, "val_excl": 1000.0, "sro": "6th Schd Table III"
+    },
+    "SN021: Cement/Concrete Block": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Builder Co",
+        "buyer_type": "Unregistered", "sale_type": "Cement/Concrete Block", "rate_idx": "Rs.3", # Check CSV
+        "hs_code_idx": "0101.2100", "qty": 12.0, "val_excl": 123.0
+    },
+    "SN022: Potassium Chlorate": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Chemical Buyer",
+        "buyer_type": "Unregistered", "sale_type": "Potassium Chlorate", "rate_idx": "18% + Rs 60", # CSV check needed
+        "hs_code_idx": "3104.2000", "qty": 1.0, "val_excl": 100.0, "uom": "KG", "sro": "EIGHTH SCHEDULE Table 1"
+    },
+    "SN023: Sale of CNG": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "CNG Car Owner",
+        "buyer_type": "Unregistered", "sale_type": "CNG Sales", "rate_idx": "Rs.200", # CSV check needed
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 234.0, "sro": "581(1)/2024"
+    },
+    "SN024: SRO 297(1)/2023": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "SRO Buyer",
+        "buyer_type": "Unregistered", "sale_type": "Goods as per SRO.297( )/2023", "rate_idx": "25%",
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0, "sro": "297(I)/2023-Table-"
+    },
+    "SN025: Fixed ST (Drugs)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000078", "buyer_name": "Pharma Buyer",
+        "buyer_type": "Unregistered", "sale_type": "Non-Adjustable Supplies", "rate_idx": "0%",
+        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 100.0, "sro": "EIGHTH SCHEDULE Table 1"
+    },
+    "SN026: Retailer (Standard)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000078", "buyer_name": "Consumer (POS)",
+        "buyer_type": "Registered", "sale_type": "Goods at standard rate (default)", "rate_idx": "18%",
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0
+    },
+    "SN027: Retailer (3rd Schedule)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "7000006", "buyer_name": "Consumer (POS)",
+        "buyer_type": "Registered", "sale_type": "3rd Schedule Goods", "rate_idx": "18%",
+        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 0.0, "fixed_val": 100.0
+    },
+    "SN028: Retailer (Reduced Rate)": {
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Consumer (POS)",
+        "buyer_type": "Registered", "sale_type": "Goods at Reduced Rate", "rate_idx": "1%",
+        "hs_code_idx": "0101.2100", "qty": 0.0, "val_excl": 0.0, "fixed_val": 100.0
+    },
+}
 CSV_FILE_NAME = "REFERENCES - REFERENCES.csv" 
 
 # --- PAGE SETUP ---
@@ -173,6 +319,58 @@ def clear_form():
     init_state()
 
 # --- APP LAYOUT (HEADER) ---
+# ==========================================
+# 🧪 SIDEBAR: TEST DATA LOADER
+# ==========================================
+st.sidebar.markdown("---")
+st.sidebar.header("🧪 Test Data Loader")
+selected_scenario = st.sidebar.selectbox("Load FBR Scenario", list(TEST_SCENARIOS.keys()))
+
+if selected_scenario != "Select a Scenario...":
+    data = TEST_SCENARIOS[selected_scenario]
+    
+    # Helper to check if option exists in dropdown before setting
+    # (Prevents crashing if your CSV doesn't have the exact same text)
+    def set_safe(key, value, options_list=None):
+        if options_list:
+            # For Dropdowns: Check if value exists in list
+            # We check partially because PDF might say "18%" but CSV has "18.00%"
+            match = next((x for x in options_list if str(value) in str(x)), None)
+            if match:
+                st.session_state[key] = match
+            else:
+                st.sidebar.warning(f"⚠️ '{value}' not found in {key} options.")
+        else:
+            # For Text Inputs: Just set it
+            st.session_state[key] = value
+
+    if st.sidebar.button(f"Apply {selected_scenario}"):
+        # Load Text Fields
+        set_safe('buyer_reg', data.get('buyer_reg', ''))
+        set_safe('buyer_name', data.get('buyer_name', ''))
+        set_safe('buyer_addr', "Karachi") # Default for all tests
+        set_safe('qty', data.get('qty', 1.0))
+        set_safe('val_excl', data.get('val_excl', 0.0))
+        set_safe('fixed_val', data.get('fixed_val', 0.0))
+        
+        # Load Dropdowns (Matches against your ref_data)
+        set_safe('doc_type', data.get('doc_type'), get_options("Document Type"))
+        set_safe('buyer_type', data.get('buyer_type'), get_options("Buyer Type"))
+        set_safe('sale_type', data.get('sale_type'), get_options("Sale Types"))
+        set_safe('rate_idx', data.get('rate_idx'), get_options("Rate"))
+        set_safe('uom', data.get('uom', 'Numbers'), get_options("UOM"))
+        set_safe('sro', data.get('sro'), get_options("SRO"))
+        set_safe('item_no', data.get('item_no'), get_options("Item Sr. No."))
+        
+        # HS Code is Tricky (Partial Match)
+        hs_val = data.get('hs_code_idx')
+        if hs_val:
+            # Finds the option that starts with the code (e.g. "0101.2100")
+            hs_match = next((x for x in get_options("Description") if x.startswith(hs_val)), None)
+            if hs_match: st.session_state['hs_code_idx'] = hs_match
+
+        st.success("✅ Data Loaded!")
+        st.rerun()
 c1, c2, c3 = st.columns([1, 5, 1])
 with c1: st.image("FBR-Logo-Small.png", width=100)
 with c2: 
