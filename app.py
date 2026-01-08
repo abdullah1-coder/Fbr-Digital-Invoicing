@@ -40,6 +40,26 @@ st.set_page_config(page_title="FBR Digital Invoicing", page_icon="FBR-Logo-Small
 st.markdown("""
     <style>
     .main { background-color: #F5F7F9; }
+    
+    /* STYLE FOR THE CARDS */
+    .css-card {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    /* STYLE FOR THE HEADERS inside cards */
+    .header-bar {
+        background-color: #004B87;
+        color: white;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    
     .stButton>button {
         width: 100%;
         background-color: #004B87;
@@ -47,6 +67,7 @@ st.markdown("""
         border-radius: 8px;
         height: 50px;
         font-weight: bold;
+        font-size: 18px;
     }
     .block-container { padding-top: 2rem; }
     </style>
