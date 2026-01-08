@@ -4,7 +4,37 @@ import datetime
 import requests
 import json
 import re
+# In your app.py
 
+if st.button("Generate Invoice"):
+    
+    # 👇 THIS IS YOUR NEW LIVE BACKEND 👇
+    api_url = "https://fbr-digital-invoicing.onrender.com/submit-invoice"
+    
+    # Data to send
+    payload = {
+        "invoice_id": "INV-001", # You can make this dynamic later
+        "usin": "USIN001",
+        "total_bill": 5000.0,
+        "items": [] # Add your items logic here
+    }
+    
+    # Headers (This simulates "Client A")
+    headers = {"x-client-id": "client_A"}
+
+    with st.spinner("Talking to FBR..."):
+        try:
+            response = requests.post(api_url, json=payload, headers=headers)
+            data = response.json()
+            
+            if response.status_code == 200:
+                st.success("Success!")
+                st.write(f"FBR Invoice No: {data['fbr_invoice_number']}")
+            else:
+                st.error(f"Error: {data['detail']}")
+                
+        except Exception as e:
+            st.error(f"Connection Failed: {e}")
 # ==========================================
 # ⚙️ MULTI-CLIENT CONFIGURATION
 # ==========================================
