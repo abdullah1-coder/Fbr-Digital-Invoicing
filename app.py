@@ -30,8 +30,7 @@ CLIENT_CONFIG = {
     }
 }
 # ==========================================
-# ==========================================
-# 🧪 FBR TESTING SCENARIOS (SOURCE: DI SANDBOX PDF)
+# 🧪 FBR TESTING SCENARIOS (STRICTLY FROM PDF)
 # ==========================================
 TEST_SCENARIOS = {
     "Select a Scenario...": {},
@@ -42,139 +41,161 @@ TEST_SCENARIOS = {
         "hs_code_idx": "0101.2100", "qty": 400.0, "val_excl": 1000.0, "uom": "Numbers, pieces, units"
     },
     "SN002: Standard Rate (Unreg Buyer)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1234567", "buyer_name": "Unregistered Buyer",
+        "doc_type": "Sale Invoice", "buyer_reg": "1234567", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Goods at standard rate (default)", "rate_idx": "18%",
         "hs_code_idx": "0101.2100", "qty": 400.0, "val_excl": 1000.0, "uom": "Numbers, pieces, units"
     },
     "SN003: Steel / Re-Rolling": {
-        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "Steel Buyer Ltd",
+        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Steel melting and re-rolling", "rate_idx": "18%",
         "hs_code_idx": "7214.1010", "qty": 1.0, "val_excl": 205000.0, "uom": "MT"
     },
     "SN004: Ship Breaking (Scrap)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "Ship Scrapper Co",
+        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Ship breaking", "rate_idx": "18%",
         "hs_code_idx": "7204.1010", "qty": 1.0, "val_excl": 175000.0, "uom": "MT"
     },
     "SN005: Reduced Rate (8th Sch)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Reduced Rate Buyer",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Goods at Reduced Rate", "rate_idx": "1%",
-        "hs_code_idx": "0102.2930", "qty": 1.0, "val_excl": 1000.0, "sro": "EIGHTH SCHEDULE Table 1", "item_no": "82"
+        "hs_code_idx": "0102.2930", "qty": 1.0, "val_excl": 1000.0, "sro": "EIGHTH SCHEDULE Table 1", "item_no": "82",
+        "uom": "Numbers, pieces, units"
     },
     "SN006: Exempt Goods (6th Sch)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "2046004", "buyer_name": "Exempt Buyer Reg",
-        "buyer_type": "Registered", "sale_type": "Exempt goods", "rate_idx": "Exempt", # Check your CSV for exact spelling
-        "hs_code_idx": "0102.2930", "qty": 1.0, "val_excl": 10.0, "sro": "6th Schd Table I", "item_no": "100"
+        "doc_type": "Sale Invoice", "buyer_reg": "2046004", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
+        "buyer_type": "Registered", "sale_type": "Exempt goods", "rate_idx": "Exempt", 
+        "hs_code_idx": "0102.2930", "qty": 1.0, "val_excl": 10.0, "sro": "6th Schd Table I", "item_no": "100",
+        "uom": "Numbers, pieces, units"
     },
     "SN007: Zero-Rated (5th Sch)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "Exporter Co",
+        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Goods at zero-rate", "rate_idx": "0%",
-        "hs_code_idx": "0101.2100", "qty": 100.0, "val_excl": 100.0, "sro": "327(1)/2008"
+        "hs_code_idx": "0101.2100", "qty": 100.0, "val_excl": 100.0, "sro": "327(1)/2008",
+        "uom": "Numbers, pieces, units"
     },
     "SN008: 3rd Schedule Goods": {
-        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "Retail Item Buyer",
+        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "3rd Schedule Goods", "rate_idx": "18%",
-        "hs_code_idx": "0101.2100", "qty": 100.0, "val_excl": 0.0, "fixed_val": 1000.0 # Retail Price
+        "hs_code_idx": "0101.2100", "qty": 100.0, "val_excl": 0.0, "fixed_val": 1000.0,
+        "uom": "Numbers, pieces, units"
     },
     "SN009: Cotton Ginners": {
-        "doc_type": "Sale Invoice", "buyer_reg": "2046004", "buyer_name": "Cotton Buyer Reg",
+        "doc_type": "Sale Invoice", "buyer_reg": "2046004", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Registered", "sale_type": "Cotton ginners", "rate_idx": "18%",
-        "hs_code_idx": "0101.2100", "qty": 0.0, "val_excl": 2500.0
+        "hs_code_idx": "0101.2100", "qty": 0.0, "val_excl": 2500.0,
+        "uom": "Numbers, pieces, units"
     },
     "SN010: Telecom Services": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Telecom Consumer",
-        "buyer_type": "Unregistered", "sale_type": "Telecommunication services", "rate_idx": "17%", # Check if 17% exists in your CSV
-        "hs_code_idx": "0101.2100", "qty": 1000.0, "val_excl": 100.0
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
+        "buyer_type": "Unregistered", "sale_type": "Telecommunication services", "rate_idx": "17%",
+        "hs_code_idx": "0101.2100", "qty": 1000.0, "val_excl": 100.0,
+        "uom": "Numbers, pieces, units"
     },
     "SN011: Toll Manufacturing": {
-        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "Principal Co",
+        "doc_type": "Sale Invoice", "buyer_reg": "3710505701479", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Toll Manufacturing", "rate_idx": "18%",
         "hs_code_idx": "7214.9990", "qty": 1.0, "val_excl": 205000.0, "uom": "MT"
     },
     "SN012: Petroleum Products": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Petrol Pump",
-        "buyer_type": "Unregistered", "sale_type": "Petroleum Products", "rate_idx": "1.43%", # Special Rate
-        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 100.0, "sro": "1450(I)/2021"
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
+        "buyer_type": "Unregistered", "sale_type": "Petroleum Products", "rate_idx": "1.43%",
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 100.0, "sro": "1450(I)/2021", "item_no": "4",
+        "uom": "Numbers, pieces, units"
     },
     "SN013: Electricity to Retailers": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Retail Shop Elec",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Electricity Supply to Retailers", "rate_idx": "5%",
-        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0, "sro": "1450(I)/2021", "item_no": "4",
+        "uom": "Numbers, pieces, units"
     },
     "SN014: Gas to CNG Stations": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "CNG Station",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Gas to CNG stations", "rate_idx": "18%",
-        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0,
+        "uom": "Numbers, pieces, units"
     },
     "SN015: Mobile Phones (9th Sch)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Mobile Buyer",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Mobile Phones", "rate_idx": "18%",
-        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1234.0, "sro": "NINTH SCHEDULE"
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1234.0, "sro": "NINTH SCHEDULE", "item_no": "1(A)",
+        "uom": "Numbers, pieces, units"
     },
     "SN016: Processing/Conversion": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000078", "buyer_name": "Processing Client",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000078", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Processing/Conversion of Goods", "rate_idx": "5%",
-        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 100.0
+        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 100.0,
+        "uom": "Numbers, pieces, units"
     },
     "SN017: Goods (FED in ST Mode)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "7000009", "buyer_name": "FED Payer",
+        "doc_type": "Sale Invoice", "buyer_reg": "7000009", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Goods (FED in ST Mode)", "rate_idx": "8%",
-        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 100.0
+        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 100.0,
+        "uom": "Numbers, pieces, units"
     },
     "SN018: Services (FED in ST Mode)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000056", "buyer_name": "Service Receiver",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000056", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Services (FED in ST Mode)", "rate_idx": "8%",
-        "hs_code_idx": "0101.2100", "qty": 20.0, "val_excl": 1000.0
+        "hs_code_idx": "0101.2100", "qty": 20.0, "val_excl": 1000.0,
+        "uom": "Numbers, pieces, units"
     },
     "SN019: Services (ICT Ordinance)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "ICT Service Buyer",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Services", "rate_idx": "5%",
-        "hs_code_idx": "0101.2900", "qty": 1.0, "val_excl": 100.0, "sro": "ICTO TABLE I"
+        "hs_code_idx": "0101.2900", "qty": 1.0, "val_excl": 100.0, "sro": "ICTO TABLE I", "item_no": "1(ii)(ii)(a)",
+        "uom": "Numbers, pieces, units"
     },
     "SN020: Electric Vehicles": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "EV Buyer",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Electric Vehicle", "rate_idx": "1%",
-        "hs_code_idx": "0101.2900", "qty": 122.0, "val_excl": 1000.0, "sro": "6th Schd Table III"
+        "hs_code_idx": "0101.2900", "qty": 122.0, "val_excl": 1000.0, "sro": "6th Schd Table III", "item_no": "20",
+        "uom": "Numbers, pieces, units"
     },
     "SN021: Cement/Concrete Block": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Builder Co",
-        "buyer_type": "Unregistered", "sale_type": "Cement/Concrete Block", "rate_idx": "Rs.3", # Check CSV
-        "hs_code_idx": "0101.2100", "qty": 12.0, "val_excl": 123.0
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
+        "buyer_type": "Unregistered", "sale_type": "Cement/Concrete Block", "rate_idx": "Rs.3", 
+        "hs_code_idx": "0101.2100", "qty": 12.0, "val_excl": 123.0,
+        "uom": "Numbers, pieces, units"
     },
     "SN022: Potassium Chlorate": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Chemical Buyer",
-        "buyer_type": "Unregistered", "sale_type": "Potassium Chlorate", "rate_idx": "18% + Rs 60", # CSV check needed
-        "hs_code_idx": "3104.2000", "qty": 1.0, "val_excl": 100.0, "uom": "KG", "sro": "EIGHTH SCHEDULE Table 1"
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
+        "buyer_type": "Unregistered", "sale_type": "Potassium Chlorate", "rate_idx": "18% along with rupees 60 per kilogram",
+        "hs_code_idx": "3104.2000", "qty": 1.0, "val_excl": 100.0, "uom": "KG", "sro": "EIGHTH SCHEDULE Table 1", "item_no": "56"
     },
     "SN023: Sale of CNG": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "CNG Car Owner",
-        "buyer_type": "Unregistered", "sale_type": "CNG Sales", "rate_idx": "Rs.200", # CSV check needed
-        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 234.0, "sro": "581(1)/2024"
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
+        "buyer_type": "Unregistered", "sale_type": "CNG Sales", "rate_idx": "Rs.200", 
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 234.0, "sro": "581(1)/2024", "item_no": "Region-I",
+        "uom": "Numbers, pieces, units"
     },
     "SN024: SRO 297(1)/2023": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "SRO Buyer",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Goods as per SRO.297( )/2023", "rate_idx": "25%",
-        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0, "sro": "297(I)/2023-Table-"
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0, "sro": "297(I)/2023-Table- ", "item_no": "12",
+        "uom": "Numbers, pieces, units"
     },
     "SN025: Fixed ST (Drugs)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000078", "buyer_name": "Pharma Buyer",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000078", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Unregistered", "sale_type": "Non-Adjustable Supplies", "rate_idx": "0%",
-        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 100.0, "sro": "EIGHTH SCHEDULE Table 1"
+        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 100.0, "sro": "EIGHTH SCHEDULE Table 1", "item_no": "81",
+        "uom": "Numbers, pieces, units"
     },
     "SN026: Retailer (Standard)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000078", "buyer_name": "Consumer (POS)",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000078", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Registered", "sale_type": "Goods at standard rate (default)", "rate_idx": "18%",
-        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0
+        "hs_code_idx": "0101.2100", "qty": 123.0, "val_excl": 1000.0,
+        "uom": "Numbers, pieces, units"
     },
     "SN027: Retailer (3rd Schedule)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "7000006", "buyer_name": "Consumer (POS)",
+        "doc_type": "Sale Invoice", "buyer_reg": "7000006", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Registered", "sale_type": "3rd Schedule Goods", "rate_idx": "18%",
-        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 0.0, "fixed_val": 100.0
+        "hs_code_idx": "0101.2100", "qty": 1.0, "val_excl": 0.0, "fixed_val": 100.0,
+        "uom": "Numbers, pieces, units"
     },
     "SN028: Retailer (Reduced Rate)": {
-        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "Consumer (POS)",
+        "doc_type": "Sale Invoice", "buyer_reg": "1000000000000", "buyer_name": "FERTILIZER MANUFAC IRS NEW",
         "buyer_type": "Registered", "sale_type": "Goods at Reduced Rate", "rate_idx": "1%",
-        "hs_code_idx": "0101.2100", "qty": 0.0, "val_excl": 0.0, "fixed_val": 100.0
+        "hs_code_idx": "0101.2100", "qty": 0.0, "val_excl": 0.0, "fixed_val": 100.0, "sro": "EIGHTH SCHEDULE Table 1", "item_no": "70",
+        "uom": "Numbers, pieces, units"
     },
 }
 CSV_FILE_NAME = "REFERENCES - REFERENCES.csv" 
